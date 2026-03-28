@@ -508,10 +508,10 @@
 
     const PIRATE = {
       win:      n  => [`${n} plunders the board! 🏴‍☠️`, `${n} rules the seven seas! ☠️`, `${n} claims the treasure! ⚓`, `Victory to ${n}! 💀`],
-      draw:        => ['No quarter given — DRAW! 🌊', "The seas be calm... it's a draw! ⚓", 'Dead men tell no tales... DRAW! ☠️'],
+      draw:     () => ['No quarter given — DRAW! 🌊', "The seas be calm... it's a draw! ⚓", 'Dead men tell no tales... DRAW! ☠️'],
       turnX:    n  => [`${n}'s move, matey! 🗡️`, `${n} plots the course! ⚓`, `${n} aims the cannon! 💥`],
       turnO:    n  => [`${n} strikes! 🏴‍☠️`, `${n} makes a move! ⚓`, `${n} fires back! 💥`],
-      botThink:    => ['The bot calculates... 🧠', 'Processing pirate logic... ⚙️', 'The machine schemes... 🤖'],
+      botThink: () => ['The bot calculates... 🧠', 'Processing pirate logic... ⚙️', 'The machine schemes... 🤖'],
     };
     const rand = arr => arr[Math.floor(Math.random() * arr.length)];
 
