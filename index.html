@@ -454,6 +454,29 @@
     .result-ring.blue { border-color: var(--blue); }
     .result-ring.red  { border-color: var(--red);  }
     @keyframes ringPulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.7); opacity: 0; } }
+
+    /* ── MOBILE FIT ── */
+    @media (max-height: 750px), (max-width: 400px) {
+      body { padding: 10px 12px; }
+      .card { padding: 1.1rem 1.2rem 1.1rem; border-radius: 20px; }
+      .card::before, .card::after { font-size: 1rem; top: 10px; }
+      h1 { font-size: 0.95rem; margin-bottom: 0.1rem; }
+      .swords { font-size: 0.85rem; margin-bottom: 0.05rem; }
+      .players { gap: 0.9rem; margin-bottom: 0.45rem; }
+      .player-avatar { width: 34px; height: 34px; border-width: 2px; }
+      .vs { font-size: 0.95rem; }
+      .player-name { font-size: 0.55rem; }
+      .player-tag  { font-size: 0.48rem; }
+      #status { font-size: 0.88rem; min-height: 1.2rem; margin-bottom: 0.65rem; }
+      #board { width: min(255px, 80vw); gap: 6px; }
+      .cell { border-radius: 11px; }
+      .scores { gap: 0.55rem; margin-top: 0.65rem; }
+      .score-item { padding: 0.28rem 0.6rem; border-radius: 10px; }
+      .score-label { font-size: 0.48rem; }
+      .score-val { font-size: 1rem; }
+      .game-actions { margin-top: 0.75rem; gap: 0.45rem; }
+      .btn-pill { padding: 0.45rem 1rem; font-size: 0.72rem; }
+    }
   </style>
 </head>
 <body>
@@ -718,46 +741,80 @@
     // ── Sound Engine (Web Audio API) ──
     const AC = new (window.AudioContext || window.webkitAudioContext)();
     function resumeAC() { if (AC.state === 'suspended') AC.resume(); }
-    document.addEventListener('click', resumeAC, { once: true });
+    document.addEventListener('click',      resumeAC, { once: true });
     document.addEventListener('touchstart', resumeAC, { once: true });
 
-    function playTone({ freq = 440, type = 'sine', gain = 0.3, attack = 0.01, decay = 0.15, duration = 0.18 } = {}) {
+    function tone({ freq = 440, endFreq, type = 'sine', gain = 0.3, attack = 0.01, decay = 0.15, duration = 0.18, distort = false } = {}) {
       const osc = AC.createOscillator();
       const amp = AC.createGain();
-      osc.connect(amp); amp.connect(AC.destination);
-      osc.type = type; osc.frequency.setValueAtTime(freq, AC.currentTime);
+      let node = osc;
+      if (distort) {
+        const ws = AC.createWaveShaper();
+        const curve = new Float32Array(256);
+        for (let i = 0; i < 256; i++) { const x = (i * 2) / 256 - 1; curve[i] = (Math.PI + 400) * x / (Math.PI + 400 * Math.abs(x)); }
+        ws.curve = curve;
+        osc.connect(ws); ws.connect(amp);
+      } else {
+        osc.connect(amp);
+      }
+      amp.connect(AC.destination);
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, AC.currentTime);
+      if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, AC.currentTime + duration);
       amp.gain.setValueAtTime(0, AC.currentTime);
       amp.gain.linearRampToValueAtTime(gain, AC.currentTime + attack);
       amp.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + attack + decay);
-      osc.start(AC.currentTime); osc.stop(AC.currentTime + duration);
+      osc.start(AC.currentTime);
+      osc.stop(AC.currentTime + Math.max(duration, attack + decay + 0.05));
     }
 
-    function playSequence(notes) {
-      notes.forEach(([freq, delay, opts]) => setTimeout(() => playTone({ freq, ...opts }), delay));
-    }
+    function seq(notes) { notes.forEach(([freq, delay, opts]) => setTimeout(() => tone({ freq, ...opts }), delay)); }
 
     const SFX = {
-      click:   () => playTone({ freq: 600, type: 'sine',    gain: 0.18, decay: 0.08 }),
-      place:   () => playTone({ freq: 320, type: 'triangle', gain: 0.25, decay: 0.12 }),
-      hover:   () => playTone({ freq: 900, type: 'sine',    gain: 0.06, decay: 0.05 }),
-      winCell: () => playTone({ freq: 880, type: 'sine',    gain: 0.2,  decay: 0.2  }),
-      win:     () => playSequence([
-        [523, 0,   { type: 'triangle', gain: 0.3, decay: 0.15 }],
-        [659, 120, { type: 'triangle', gain: 0.3, decay: 0.15 }],
-        [784, 240, { type: 'triangle', gain: 0.3, decay: 0.15 }],
-        [1046,360, { type: 'triangle', gain: 0.4, decay: 0.4  }],
+      // Bouncy cartoon boing when placing a piece
+      place: () => {
+        tone({ freq: 200, endFreq: 600, type: 'sine',     gain: 0.28, attack: 0.01, decay: 0.18, duration: 0.2 });
+        tone({ freq: 400, endFreq: 900, type: 'triangle', gain: 0.12, attack: 0.01, decay: 0.12, duration: 0.15 });
+      },
+      // Glitchy laser zap for the bot
+      botMove: () => {
+        tone({ freq: 1200, endFreq: 200, type: 'sawtooth', gain: 0.18, attack: 0.005, decay: 0.15, duration: 0.18 });
+        setTimeout(() => tone({ freq: 600, endFreq: 300, type: 'square', gain: 0.08, attack: 0.005, decay: 0.1, duration: 0.12 }), 60);
+      },
+      // Sparkle chime per win cell
+      winCell: () => {
+        tone({ freq: 1200 + Math.random()*400, type: 'sine', gain: 0.18, attack: 0.005, decay: 0.25 });
+        setTimeout(() => tone({ freq: 1600 + Math.random()*400, type: 'sine', gain: 0.1, attack: 0.005, decay: 0.2 }), 40);
+      },
+      // Big triumphant pirate fanfare
+      win: () => seq([
+        [261, 0,   { type: 'triangle', gain: 0.35, decay: 0.2 }],
+        [329, 100, { type: 'triangle', gain: 0.35, decay: 0.2 }],
+        [392, 200, { type: 'triangle', gain: 0.35, decay: 0.2 }],
+        [523, 300, { type: 'triangle', gain: 0.4,  decay: 0.35 }],
+        [784, 420, { type: 'sine',     gain: 0.45, decay: 0.6 }],
+        [261, 300, { type: 'square',   gain: 0.08, decay: 0.3 }],  // bass harmony
+        [196, 420, { type: 'square',   gain: 0.1,  decay: 0.5 }],
       ]),
-      draw:    () => playSequence([
-        [440, 0,   { type: 'sawtooth', gain: 0.2, decay: 0.2 }],
-        [415, 180, { type: 'sawtooth', gain: 0.2, decay: 0.2 }],
-        [392, 360, { type: 'sawtooth', gain: 0.2, decay: 0.4 }],
+      // Dramatic descending foghorn draw
+      draw: () => seq([
+        [220, 0,   { type: 'sawtooth', gain: 0.25, decay: 0.35, distort: true }],
+        [185, 280, { type: 'sawtooth', gain: 0.22, decay: 0.35, distort: true }],
+        [155, 560, { type: 'sawtooth', gain: 0.2,  decay: 0.5,  distort: true }],
+        [110, 840, { type: 'sine',     gain: 0.15, decay: 0.6 }],
       ]),
-      botMove: () => playTone({ freq: 440, type: 'square', gain: 0.12, decay: 0.08 }),
-      navigate:() => playTone({ freq: 700, type: 'sine',   gain: 0.15, decay: 0.1  }),
+      // Bubbly menu navigation
+      navigate: () => {
+        tone({ freq: 520, endFreq: 780, type: 'sine',     gain: 0.2,  attack: 0.01, decay: 0.12, duration: 0.15 });
+        setTimeout(() => tone({ freq: 780, endFreq: 1040, type: 'triangle', gain: 0.12, attack: 0.01, decay: 0.1, duration: 0.12 }), 70);
+      },
+      // Soft coin-clink for generic clicks
+      click: () => {
+        tone({ freq: 900, endFreq: 1400, type: 'sine', gain: 0.15, attack: 0.005, decay: 0.1, duration: 0.12 });
+        setTimeout(() => tone({ freq: 1400, type: 'sine', gain: 0.08, attack: 0.005, decay: 0.08 }), 50);
+      },
     };
 
-    // Hover sounds on cells
-    cells.forEach(c => c.addEventListener('mouseenter', () => { if (!c.classList.contains('taken')) SFX.hover(); }));
 
     // ── Result overlay ──
     const resultOverlay = document.getElementById('result-overlay');
