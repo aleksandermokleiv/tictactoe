@@ -342,6 +342,118 @@
     /* Confetti */
     .confetti { position: fixed; pointer-events: none; animation: confettiFall linear forwards; }
     @keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+
+    /* ── RESULT OVERLAY ── */
+    #result-overlay {
+      position: fixed; inset: 0; z-index: 90;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px;
+      pointer-events: none; opacity: 0;
+    }
+    #result-overlay.show {
+      pointer-events: all;
+      animation: overlayIn 0.5s cubic-bezier(0.34,1.3,0.64,1) forwards;
+    }
+    #result-overlay.hide {
+      animation: overlayOut 0.4s ease forwards;
+    }
+    @keyframes overlayIn  { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes overlayOut { from { opacity: 1; } to { opacity: 0; pointer-events: none; } }
+
+    /* Blurred backdrop */
+    #result-overlay::before {
+      content: ''; position: fixed; inset: 0;
+      background: rgba(5,8,16,0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: -1;
+    }
+
+    .result-card {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 2.5rem 2.2rem 2rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 32px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      max-width: 340px; width: 100%;
+      animation: cardBounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;
+    }
+    @keyframes cardBounceIn { from { transform: scale(0.7) translateY(40px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    .result-card.win-blue  { border-color: rgba(59,130,246,0.4); box-shadow: 0 24px 80px rgba(59,130,246,0.25), 0 0 0 1px rgba(59,130,246,0.2) inset; }
+    .result-card.win-red   { border-color: rgba(239,68,68,0.4);  box-shadow: 0 24px 80px rgba(239,68,68,0.25),  0 0 0 1px rgba(239,68,68,0.2) inset;  }
+    .result-card.draw-card { border-color: rgba(255,255,255,0.18); }
+
+    /* Win avatar */
+    .result-avatar-wrap { position: relative; margin-bottom: 1.2rem; }
+    .result-avatar {
+      width: 90px; height: 90px; border-radius: 50%; object-fit: cover;
+      border: 3px solid; display: block;
+      animation: resultAvatarIn 0.5s cubic-bezier(0.34,1.8,0.64,1) 0.3s both;
+    }
+    @keyframes resultAvatarIn { from { transform: scale(0) rotate(-30deg); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .result-avatar.blue { border-color: var(--blue); box-shadow: 0 0 0 6px var(--blue-glow), 0 8px 30px var(--blue-glow); }
+    .result-avatar.red  { border-color: var(--red);  box-shadow: 0 0 0 6px var(--red-glow),  0 8px 30px var(--red-glow);  }
+
+    /* Draw avatars */
+    .result-draw-avatars { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.2rem; }
+    .result-draw-avatars .result-avatar { width: 64px; height: 64px; }
+    .result-draw-avatars .result-avatar:first-child { animation-delay: 0.25s; }
+    .result-draw-avatars .result-avatar:last-child  { animation-delay: 0.40s; }
+    .result-draw-clash { font-size: 1.8rem; animation: clashSpin 0.6s cubic-bezier(0.34,1.8,0.64,1) 0.5s both; }
+    @keyframes clashSpin { from { transform: scale(0) rotate(180deg); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    /* Crown above win avatar */
+    .result-crown {
+      position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+      font-size: 1.8rem; line-height: 1;
+      animation: crownDrop 0.5s cubic-bezier(0.34,1.8,0.64,1) 0.6s both;
+    }
+    @keyframes crownDrop { from { transform: translateX(-50%) translateY(-20px) scale(0); opacity: 0; } to { transform: translateX(-50%) translateY(0) scale(1); opacity: 1; } }
+
+    .result-label {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+      margin-bottom: 0.3rem; opacity: 0.6;
+    }
+    .result-label.blue { color: var(--blue-light); }
+    .result-label.red  { color: var(--red-light);  }
+    .result-label.draw { color: rgba(255,255,255,0.5); }
+
+    .result-title {
+      font-family: 'Pirata One', cursive;
+      font-size: clamp(2rem, 8vw, 2.8rem);
+      letter-spacing: 0.06em; text-align: center; line-height: 1.1;
+      animation: titleSlam 0.5s cubic-bezier(0.34,1.4,0.64,1) 0.45s both;
+    }
+    @keyframes titleSlam { from { transform: scale(0.5) translateY(20px); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .result-title.blue { color: var(--blue-light); text-shadow: 0 0 30px var(--blue-glow); }
+    .result-title.red  { color: var(--red-light);  text-shadow: 0 0 30px var(--red-glow);  }
+    .result-title.draw { color: #f1f5f9; }
+
+    .result-subtitle {
+      font-family: 'Pirata One', cursive; font-size: 1rem;
+      color: rgba(255,255,255,0.5); margin-top: 0.4rem; text-align: center;
+      animation: fadeUp 0.4s ease 0.7s both;
+    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .result-actions { display: flex; flex-direction: column; gap: 0.7rem; width: 100%; margin-top: 1.8rem; animation: fadeUp 0.4s ease 0.85s both; }
+    .result-actions .btn-pill { width: 100%; justify-content: center; font-size: 1rem; padding: 0.85rem; }
+    .result-actions .btn-pill.primary-blue { background: var(--blue); border-color: var(--blue); color: #fff; box-shadow: 0 4px 20px var(--blue-glow); }
+    .result-actions .btn-pill.primary-blue:hover { background: #60a5fa; }
+    .result-actions .btn-pill.primary-red  { background: var(--red);  border-color: var(--red);  color: #fff; box-shadow: 0 4px 20px var(--red-glow);  }
+    .result-actions .btn-pill.primary-red:hover  { background: #f87171; }
+
+    /* Win ring pulse */
+    .result-ring {
+      position: absolute; inset: -8px; border-radius: 50%;
+      border: 2px solid; pointer-events: none;
+      animation: ringPulse 1.2s ease-out 0.4s infinite;
+    }
+    .result-ring.blue { border-color: var(--blue); }
+    .result-ring.red  { border-color: var(--red);  }
+    @keyframes ringPulse { 0% { transform: scale(1); opacity: 0.7; } 100% { transform: scale(1.7); opacity: 0; } }
   </style>
 </head>
 <body>
@@ -477,6 +589,13 @@
     </div>
   </div>
 
+  <!-- ══ RESULT OVERLAY ══ -->
+  <div id="result-overlay">
+    <div class="result-card" id="result-card">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
   <script>
     // ── DOM ──
     const screens   = { home: document.getElementById('screen-home'), charselect: document.getElementById('screen-charselect'), game: document.getElementById('screen-game') };
@@ -538,8 +657,8 @@
       setTimeout(() => { intro.style.display = 'none'; }, 700);
       showScreen('home');
     }
-    skipBtn.addEventListener('click', dismissIntro);
-    intro.addEventListener('click',   dismissIntro);
+    skipBtn.addEventListener('click', () => { SFX.navigate(); dismissIntro(); });
+    intro.addEventListener('click',   () => { SFX.navigate(); dismissIntro(); });
 
     // ── Screen nav ──
     function showScreen(name) {
@@ -548,13 +667,14 @@
     }
 
     // ── Home ──
-    document.getElementById('btn-vs-bot').addEventListener('click', () => { mode = 'bot'; showScreen('charselect'); });
-    document.getElementById('btn-vs-friend').addEventListener('click', () => { mode = 'friend'; startGame('morten', 'mathias'); });
-    document.getElementById('back-from-charselect').addEventListener('click', () => showScreen('home'));
-    document.getElementById('pick-morten').addEventListener('click',  () => { humanSide = 'X'; startGame('morten', 'mathias'); });
-    document.getElementById('pick-mathias').addEventListener('click', () => { humanSide = 'O'; startGame('morten', 'mathias'); });
-    document.getElementById('btn-new-battle').addEventListener('click', resetGame);
+    document.getElementById('btn-vs-bot').addEventListener('click', () => { SFX.navigate(); mode = 'bot'; showScreen('charselect'); });
+    document.getElementById('btn-vs-friend').addEventListener('click', () => { SFX.navigate(); mode = 'friend'; startGame('morten', 'mathias'); });
+    document.getElementById('back-from-charselect').addEventListener('click', () => { SFX.click(); showScreen('home'); });
+    document.getElementById('pick-morten').addEventListener('click',  () => { SFX.navigate(); humanSide = 'X'; startGame('morten', 'mathias'); });
+    document.getElementById('pick-mathias').addEventListener('click', () => { SFX.navigate(); humanSide = 'O'; startGame('morten', 'mathias'); });
+    document.getElementById('btn-new-battle').addEventListener('click', () => { SFX.click(); resetGame(); });
     document.getElementById('btn-quit').addEventListener('click', () => {
+      SFX.navigate();
       scores = { X: 0, O: 0, D: 0 };
       scoreXEl.textContent = '0'; scoreOEl.textContent = '0'; scoreDEl.textContent = '0';
       showScreen('home');
@@ -595,22 +715,134 @@
       playerO.className = 'player ' + (current === 'O' ? 'active' : 'inactive');
     }
 
+    // ── Sound Engine (Web Audio API) ──
+    const AC = new (window.AudioContext || window.webkitAudioContext)();
+    function resumeAC() { if (AC.state === 'suspended') AC.resume(); }
+    document.addEventListener('click', resumeAC, { once: true });
+    document.addEventListener('touchstart', resumeAC, { once: true });
+
+    function playTone({ freq = 440, type = 'sine', gain = 0.3, attack = 0.01, decay = 0.15, duration = 0.18 } = {}) {
+      const osc = AC.createOscillator();
+      const amp = AC.createGain();
+      osc.connect(amp); amp.connect(AC.destination);
+      osc.type = type; osc.frequency.setValueAtTime(freq, AC.currentTime);
+      amp.gain.setValueAtTime(0, AC.currentTime);
+      amp.gain.linearRampToValueAtTime(gain, AC.currentTime + attack);
+      amp.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + attack + decay);
+      osc.start(AC.currentTime); osc.stop(AC.currentTime + duration);
+    }
+
+    function playSequence(notes) {
+      notes.forEach(([freq, delay, opts]) => setTimeout(() => playTone({ freq, ...opts }), delay));
+    }
+
+    const SFX = {
+      click:   () => playTone({ freq: 600, type: 'sine',    gain: 0.18, decay: 0.08 }),
+      place:   () => playTone({ freq: 320, type: 'triangle', gain: 0.25, decay: 0.12 }),
+      hover:   () => playTone({ freq: 900, type: 'sine',    gain: 0.06, decay: 0.05 }),
+      winCell: () => playTone({ freq: 880, type: 'sine',    gain: 0.2,  decay: 0.2  }),
+      win:     () => playSequence([
+        [523, 0,   { type: 'triangle', gain: 0.3, decay: 0.15 }],
+        [659, 120, { type: 'triangle', gain: 0.3, decay: 0.15 }],
+        [784, 240, { type: 'triangle', gain: 0.3, decay: 0.15 }],
+        [1046,360, { type: 'triangle', gain: 0.4, decay: 0.4  }],
+      ]),
+      draw:    () => playSequence([
+        [440, 0,   { type: 'sawtooth', gain: 0.2, decay: 0.2 }],
+        [415, 180, { type: 'sawtooth', gain: 0.2, decay: 0.2 }],
+        [392, 360, { type: 'sawtooth', gain: 0.2, decay: 0.4 }],
+      ]),
+      botMove: () => playTone({ freq: 440, type: 'square', gain: 0.12, decay: 0.08 }),
+      navigate:() => playTone({ freq: 700, type: 'sine',   gain: 0.15, decay: 0.1  }),
+    };
+
+    // Hover sounds on cells
+    cells.forEach(c => c.addEventListener('mouseenter', () => { if (!c.classList.contains('taken')) SFX.hover(); }));
+
+    // ── Result overlay ──
+    const resultOverlay = document.getElementById('result-overlay');
+    const resultCard    = document.getElementById('result-card');
+
+    function showResult(type, winSide) {
+      const color = winSide === 'X' ? 'blue' : winSide === 'O' ? 'red' : null;
+      const winName  = winSide === 'X' ? nameX.textContent : nameO.textContent;
+      const winImg   = winSide === 'X' ? avatarX.src : avatarO.src;
+      const winQuote = winSide ? rand(PIRATE.win(winName)) : rand(PIRATE.draw());
+      const primaryBtn = color === 'blue' ? 'primary-blue' : color === 'red' ? 'primary-red' : '';
+
+      if (type === 'win') {
+        resultCard.className = `result-card win-${color}`;
+        resultCard.innerHTML = `
+          <div class="result-avatar-wrap">
+            <div class="result-ring ${color}"></div>
+            <img class="result-avatar ${color}" src="${winImg}" alt="${winName}">
+            <div class="result-crown">👑</div>
+          </div>
+          <div class="result-label ${color}">${color === 'blue' ? '⚡ Technologist' : '🚴 Cycling God'}</div>
+          <div class="result-title ${color}">${winName} Wins!</div>
+          <div class="result-subtitle">${winQuote}</div>
+          <div class="result-actions">
+            <button class="btn-pill ${primaryBtn}" id="res-again">⚓ Play Again</button>
+            <button class="btn-pill secondary" id="res-quit">🏳️ Quit to Menu</button>
+          </div>`;
+      } else {
+        resultCard.className = 'result-card draw-card';
+        resultCard.innerHTML = `
+          <div class="result-draw-avatars">
+            <img class="result-avatar blue" src="${avatarX.src}" alt="${nameX.textContent}">
+            <span class="result-draw-clash">💥</span>
+            <img class="result-avatar red"  src="${avatarO.src}" alt="${nameO.textContent}">
+          </div>
+          <div class="result-label draw">⚓ Stalemate</div>
+          <div class="result-title draw">It's a Draw!</div>
+          <div class="result-subtitle">${winQuote}</div>
+          <div class="result-actions">
+            <button class="btn-pill" id="res-again">⚓ Play Again</button>
+            <button class="btn-pill secondary" id="res-quit">🏳️ Quit to Menu</button>
+          </div>`;
+      }
+
+      resultOverlay.classList.remove('hide');
+      resultOverlay.classList.add('show');
+
+      document.getElementById('res-again').addEventListener('click', () => {
+        SFX.navigate();
+        hideResult();
+        setTimeout(resetGame, 400);
+      });
+      document.getElementById('res-quit').addEventListener('click', () => {
+        SFX.navigate();
+        hideResult();
+        setTimeout(() => {
+          scores = { X: 0, O: 0, D: 0 };
+          scoreXEl.textContent = '0'; scoreOEl.textContent = '0'; scoreDEl.textContent = '0';
+          showScreen('home');
+        }, 400);
+      });
+    }
+
+    function hideResult() {
+      resultOverlay.classList.remove('show');
+      resultOverlay.classList.add('hide');
+    }
+
     function bumpScore(el) { el.classList.remove('bump'); el.offsetHeight; el.classList.add('bump'); }
 
     function launchConfetti(color) {
       const blues = ['#3b82f6','#60a5fa','#93c5fd','#bfdbfe','#ffffff'];
       const reds  = ['#ef4444','#f87171','#fca5a5','#fecaca','#ffffff'];
-      const palette = color === 'blue' ? blues : reds;
-      for (let i = 0; i < 70; i++) {
+      const grey  = ['#94a3b8','#cbd5e1','#e2e8f0','#ffffff','#64748b'];
+      const palette = color === 'blue' ? blues : color === 'red' ? reds : grey;
+      for (let i = 0; i < 80; i++) {
         const c = document.createElement('div');
         c.className = 'confetti';
         c.style.left = Math.random() * 100 + 'vw';
         c.style.background = palette[Math.floor(Math.random() * palette.length)];
-        c.style.width  = (5 + Math.random() * 9) + 'px';
-        c.style.height = (5 + Math.random() * 9) + 'px';
+        c.style.width  = (5 + Math.random() * 10) + 'px';
+        c.style.height = (5 + Math.random() * 10) + 'px';
         c.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
         c.style.animationDuration = (1.4 + Math.random() * 2.2) + 's';
-        c.style.animationDelay    = (Math.random() * 0.9) + 's';
+        c.style.animationDelay    = (Math.random() * 0.8) + 's';
         document.body.appendChild(c);
         c.addEventListener('animationend', () => c.remove());
       }
@@ -624,7 +856,7 @@
     function markWinCells() {
       for (const [a, b, c] of WINS) {
         if (board[a] && board[a] === board[b] && board[b] === board[c]) {
-          [a,b,c].forEach(i => cells[i].classList.add('win')); return;
+          [a,b,c].forEach(i => { cells[i].classList.add('win'); setTimeout(() => SFX.winCell(), i * 80); }); return;
         }
       }
     }
@@ -641,17 +873,19 @@
     function afterMove() {
       const result = checkWin(board);
       if (result === 'draw') {
-        setStatus(rand(PIRATE.draw()));
         scores.D++; scoreDEl.textContent = scores.D; bumpScore(scoreDEl);
         over = true;
+        SFX.draw();
+        launchConfetti('grey');
+        setTimeout(() => showResult('draw', null), 900);
       } else if (result) {
         markWinCells();
-        const winName = result === 'X' ? nameX.textContent : nameO.textContent;
-        setStatus(rand(PIRATE.win(winName)));
+        SFX.win();
         launchConfetti(result === 'X' ? 'blue' : 'red');
         if (result === 'X') { scores.X++; scoreXEl.textContent = scores.X; bumpScore(scoreXEl); }
         else                { scores.O++; scoreOEl.textContent = scores.O; bumpScore(scoreOEl); }
         over = true;
+        setTimeout(() => showResult('win', result), 900);
       } else {
         current = current === 'X' ? 'O' : 'X';
         updatePlayers();
@@ -669,6 +903,7 @@
         const i = +cell.dataset.i;
         if (over || board[i] || botThinking) return;
         if (mode === 'bot' && current !== humanSide) return;
+        SFX.place();
         placePiece(i, current);
         afterMove();
       });
@@ -707,7 +942,7 @@
         }
       }
       botThinking = false;
-      if (bestMove >= 0) { placePiece(bestMove, current); afterMove(); }
+      if (bestMove >= 0) { SFX.botMove(); placePiece(bestMove, current); afterMove(); }
     }
 
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');
