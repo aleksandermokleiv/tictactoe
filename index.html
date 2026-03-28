@@ -538,10 +538,8 @@
       setTimeout(() => { intro.style.display = 'none'; }, 700);
       showScreen('home');
     }
-    // Auto-dismiss after 3.2s
-    let introTimer = setTimeout(dismissIntro, 3200);
-    skipBtn.addEventListener('click', () => { clearTimeout(introTimer); dismissIntro(); });
-    intro.addEventListener('click',   () => { clearTimeout(introTimer); dismissIntro(); });
+    skipBtn.addEventListener('click', dismissIntro);
+    intro.addEventListener('click',   dismissIntro);
 
     // ── Screen nav ──
     function showScreen(name) {
