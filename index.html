@@ -529,9 +529,13 @@
     // ── Intro ──
     const intro = document.getElementById('intro');
     const skipBtn = document.getElementById('intro-skip');
+    let introDismissed = false;
     function dismissIntro() {
+      if (introDismissed) return;
+      introDismissed = true;
+      intro.style.pointerEvents = 'none';
       intro.classList.add('fade-out');
-      intro.addEventListener('animationend', () => { intro.style.display = 'none'; }, { once: true });
+      setTimeout(() => { intro.style.display = 'none'; }, 700);
       showScreen('home');
     }
     // Auto-dismiss after 3.2s
