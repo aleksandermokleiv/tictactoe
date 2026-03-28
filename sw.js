@@ -1,4 +1,4 @@
-const CACHE = 'tictactoe-v4';
+const CACHE = 'tictactoe-v5';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {
