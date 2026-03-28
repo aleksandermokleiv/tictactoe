@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tic Tac Toe</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>PEAK REBELL TAC TOE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Tic Tac Toe">
+  <meta name="apple-mobile-web-app-title" content="Peak Rebell Tac Toe">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <meta name="theme-color" content="#764ba2">
+  <meta name="theme-color" content="#b8d4f0">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -20,148 +20,387 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 24px 16px;
       font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 40%, #f64f59 100%);
-      color: #fff;
-      overflow: hidden;
+      background: linear-gradient(160deg, #dceeff 0%, #c5dff8 40%, #e8f4ff 100%);
+      color: #1a2a3a;
+      overflow-x: hidden;
+      animation: bgShift 8s ease-in-out infinite alternate;
     }
 
-    /* Soft ambient blobs */
-    body::before, body::after {
-      content: '';
+    @keyframes bgShift {
+      from { background: linear-gradient(160deg, #dceeff 0%, #c5dff8 40%, #e8f4ff 100%); }
+      to   { background: linear-gradient(160deg, #e8f4ff 0%, #d0e8ff 40%, #c5dff8 100%); }
+    }
+
+    /* Ambient blobs */
+    .blob {
       position: fixed;
       border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.35;
+      filter: blur(90px);
       pointer-events: none;
+      animation: float 10s ease-in-out infinite alternate;
     }
-    body::before {
-      width: 500px; height: 500px;
-      background: #a78bfa;
-      top: -100px; left: -100px;
+    .blob1 { width: 420px; height: 420px; background: rgba(147,197,253,0.45); top: -120px; left: -100px; animation-delay: 0s; }
+    .blob2 { width: 320px; height: 320px; background: rgba(186,230,253,0.4); bottom: -80px; right: -80px; animation-delay: -3s; }
+    .blob3 { width: 200px; height: 200px; background: rgba(224,242,254,0.5); top: 40%; left: 60%; animation-delay: -6s; }
+
+    @keyframes float {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(30px, 20px) scale(1.08); }
     }
-    body::after {
-      width: 400px; height: 400px;
-      background: #f472b6;
-      bottom: -80px; right: -80px;
+
+    /* Floating pirate decorations */
+    .deco {
+      position: fixed;
+      font-size: 2rem;
+      opacity: 0.18;
+      pointer-events: none;
+      animation: drift linear infinite;
+      user-select: none;
+    }
+    @keyframes drift {
+      0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.18; }
+      90%  { opacity: 0.18; }
+      100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
     }
 
     .card {
+      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2.5rem 3rem 2rem;
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(28px) saturate(180%);
-      -webkit-backdrop-filter: blur(28px) saturate(180%);
-      border-radius: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      box-shadow: 0 8px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+      padding: 2rem 2.2rem 1.8rem;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(32px) saturate(200%);
+      -webkit-backdrop-filter: blur(32px) saturate(200%);
+      border-radius: 32px;
+      border: 1.5px solid rgba(255,255,255,0.85);
+      box-shadow:
+        0 8px 48px rgba(100,160,230,0.18),
+        0 2px 8px rgba(100,160,230,0.1),
+        inset 0 1.5px 0 rgba(255,255,255,0.9);
+      animation: cardIn 0.6s cubic-bezier(0.34,1.56,0.64,1);
+      max-width: 100%;
+    }
+
+    @keyframes cardIn {
+      from { transform: scale(0.85) translateY(30px); opacity: 0; }
+      to   { transform: scale(1) translateY(0); opacity: 1; }
+    }
+
+    /* Skull corner decorations */
+    .card::before, .card::after {
+      content: '☠️';
+      position: absolute;
+      font-size: 1.3rem;
+      opacity: 0.5;
+      animation: wobble 3s ease-in-out infinite;
+    }
+    .card::before { top: 14px; left: 18px; animation-delay: 0s; }
+    .card::after  { top: 14px; right: 18px; animation-delay: -1.5s; }
+
+    @keyframes wobble {
+      0%,100% { transform: rotate(-8deg); }
+      50%      { transform: rotate(8deg); }
     }
 
     h1 {
-      font-size: 1.1rem;
-      font-weight: 600;
-      letter-spacing: 0.18em;
+      font-family: 'Pirata One', cursive;
+      font-size: clamp(1.2rem, 5vw, 1.7rem);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.75);
-      margin-bottom: 0.5rem;
+      color: #1a3a5c;
+      margin-bottom: 0.3rem;
+      margin-top: 0.5rem;
+      text-shadow: 0 2px 8px rgba(100,160,230,0.25);
+      animation: titleGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes titleGlow {
+      from { text-shadow: 0 2px 8px rgba(100,160,230,0.2); }
+      to   { text-shadow: 0 2px 20px rgba(100,160,230,0.6); }
+    }
+
+    .swords {
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+      opacity: 0.6;
+      letter-spacing: 0.5em;
+      animation: swordsClash 4s ease-in-out infinite;
+    }
+
+    @keyframes swordsClash {
+      0%,100% { transform: scale(1); letter-spacing: 0.5em; }
+      50%      { transform: scale(1.08); letter-spacing: 0.7em; }
+    }
+
+    /* Player indicators */
+    .players {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      align-items: center;
+    }
+
+    .player {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    .player.active { transform: scale(1.12); }
+    .player.inactive { opacity: 0.4; }
+
+    .player-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid rgba(255,255,255,0.9);
+      box-shadow: 0 4px 14px rgba(100,160,230,0.3);
+      transition: box-shadow 0.3s;
+    }
+
+    .player.active .player-avatar {
+      box-shadow: 0 0 0 3px rgba(100,180,255,0.5), 0 4px 20px rgba(100,160,230,0.5);
+      animation: avatarPulse 1.2s ease-in-out infinite;
+    }
+
+    @keyframes avatarPulse {
+      0%,100% { box-shadow: 0 0 0 3px rgba(100,180,255,0.5), 0 4px 20px rgba(100,160,230,0.5); }
+      50%      { box-shadow: 0 0 0 6px rgba(100,180,255,0.25), 0 4px 28px rgba(100,160,230,0.7); }
+    }
+
+    .player-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: #2a4a6a;
+      opacity: 0.8;
+    }
+
+    .vs {
+      font-family: 'Pirata One', cursive;
+      font-size: 1.4rem;
+      color: #4a7aaa;
+      opacity: 0.7;
     }
 
     #status {
-      font-size: 1.5rem;
-      font-weight: 600;
-      min-height: 2rem;
-      margin-bottom: 1.8rem;
-      color: #fff;
-      letter-spacing: -0.02em;
+      font-family: 'Pirata One', cursive;
+      font-size: 1.25rem;
+      font-weight: 400;
+      min-height: 1.8rem;
+      margin-bottom: 1.2rem;
+      color: #1a3a5c;
+      letter-spacing: 0.04em;
+      text-align: center;
+      animation: statusFade 0.3s ease;
+    }
+
+    @keyframes statusFade {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     #board {
       display: grid;
-      grid-template-columns: repeat(3, 100px);
-      grid-template-rows: repeat(3, 100px);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
+      width: min(320px, 90vw);
     }
 
     .cell {
-      width: 100px;
-      height: 100px;
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 16px;
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(255,255,255,0.8);
+      border-radius: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.8rem;
-      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s, transform 0.12s, box-shadow 0.2s;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
       user-select: none;
-      letter-spacing: -0.02em;
+      box-shadow: 0 2px 12px rgba(100,160,230,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+      animation: cellIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+
+    .cell:nth-child(1) { animation-delay: 0.05s; }
+    .cell:nth-child(2) { animation-delay: 0.10s; }
+    .cell:nth-child(3) { animation-delay: 0.15s; }
+    .cell:nth-child(4) { animation-delay: 0.20s; }
+    .cell:nth-child(5) { animation-delay: 0.25s; }
+    .cell:nth-child(6) { animation-delay: 0.30s; }
+    .cell:nth-child(7) { animation-delay: 0.35s; }
+    .cell:nth-child(8) { animation-delay: 0.40s; }
+    .cell:nth-child(9) { animation-delay: 0.45s; }
+
+    @keyframes cellIn {
+      from { transform: scale(0.6) rotate(-5deg); opacity: 0; }
+      to   { transform: scale(1) rotate(0deg); opacity: 1; }
     }
 
     .cell:hover:not(.taken) {
-      background: rgba(255, 255, 255, 0.2);
-      transform: scale(1.06);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      background: rgba(255, 255, 255, 0.7);
+      transform: scale(1.07) translateY(-2px);
+      box-shadow: 0 8px 24px rgba(100,160,230,0.22), inset 0 1px 0 rgba(255,255,255,0.95);
     }
 
     .cell:active:not(.taken) {
-      transform: scale(0.97);
+      transform: scale(0.95);
     }
 
-    .cell.x {
-      color: #fff;
-      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    .cell img {
+      width: 68%;
+      height: 68%;
+      border-radius: 50%;
+      object-fit: cover;
+      animation: pop 0.35s cubic-bezier(0.34,1.8,0.64,1);
+      box-shadow: 0 3px 14px rgba(0,0,0,0.15);
+      pointer-events: none;
     }
 
-    .cell.o {
-      color: rgba(255,255,255,0.85);
-      text-shadow: 0 0 20px rgba(255,255,255,0.4);
+    @keyframes pop {
+      0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+      60%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
     }
 
     .cell.win {
-      background: rgba(255, 255, 255, 0.28);
-      border-color: rgba(255,255,255,0.5);
-      box-shadow: 0 0 24px rgba(255,255,255,0.25), inset 0 1px 0 rgba(255,255,255,0.4);
-      transform: scale(1.04);
+      background: rgba(255,255,255,0.75);
+      border-color: rgba(147,210,255,0.8);
+      box-shadow: 0 0 0 3px rgba(147,210,255,0.4), 0 8px 30px rgba(100,160,230,0.3), inset 0 1px 0 rgba(255,255,255,1);
+      animation: winPulse 0.8s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+
+    @keyframes winPulse {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.13) rotate(3deg); }
+      70%  { transform: scale(1.07) rotate(-2deg); }
+      100% { transform: scale(1.05); }
+    }
+
+    /* Confetti particles */
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      pointer-events: none;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
     }
 
     #restart {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       padding: 0.65rem 2rem;
-      font-size: 0.95rem;
-      font-weight: 500;
-      font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      background: rgba(255,255,255,0.18);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.3);
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'Pirata One', cursive;
+      letter-spacing: 0.08em;
+      background: rgba(255,255,255,0.6);
+      color: #1a3a5c;
+      border: 1.5px solid rgba(255,255,255,0.85);
       border-radius: 980px;
       cursor: pointer;
-      letter-spacing: 0.01em;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: background 0.2s, transform 0.12s, box-shadow 0.2s;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 4px 16px rgba(100,160,230,0.15), inset 0 1px 0 rgba(255,255,255,0.95);
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
     }
 
     #restart:hover {
-      background: rgba(255,255,255,0.28);
-      transform: scale(1.04);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      background: rgba(255,255,255,0.85);
+      transform: scale(1.06) translateY(-1px);
+      box-shadow: 0 8px 24px rgba(100,160,230,0.25), inset 0 1px 0 rgba(255,255,255,1);
     }
 
     #restart:active {
-      transform: scale(0.97);
+      transform: scale(0.96);
+    }
+
+    /* Score board */
+    .scores {
+      display: flex;
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    .score-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(255,255,255,0.4);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: 14px;
+      padding: 0.4rem 0.9rem;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .score-label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #4a7aaa;
+    }
+
+    .score-val {
+      font-family: 'Pirata One', cursive;
+      font-size: 1.4rem;
+      color: #1a3a5c;
+      line-height: 1.2;
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .score-val.bump {
+      animation: scoreBump 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    @keyframes scoreBump {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.5); color: #3a9aff; }
+      100% { transform: scale(1); }
     }
   </style>
 </head>
 <body>
+
+  <!-- Ambient blobs -->
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+
   <div class="card">
-    <h1>Tic Tac Toe</h1>
-    <div id="status">X's turn</div>
+    <div class="swords">⚔️ ⚔️</div>
+    <h1>Peak Rebell Tac Toe</h1>
+
+    <div class="players">
+      <div class="player active" id="player-x">
+        <img class="player-avatar" src="morten.png" alt="Morten">
+        <span class="player-name">Morten</span>
+      </div>
+      <span class="vs">VS</span>
+      <div class="player inactive" id="player-o">
+        <img class="player-avatar" src="mathias.png" alt="Mathias">
+        <span class="player-name">Mathias</span>
+      </div>
+    </div>
+
+    <div id="status">Morten fires first! ☠️</div>
+
     <div id="board">
       <div class="cell" data-i="0"></div>
       <div class="cell" data-i="1"></div>
@@ -173,13 +412,34 @@
       <div class="cell" data-i="7"></div>
       <div class="cell" data-i="8"></div>
     </div>
-    <button id="restart">New Game</button>
+
+    <div class="scores">
+      <div class="score-item">
+        <span class="score-label">Morten</span>
+        <span class="score-val" id="score-x">0</span>
+      </div>
+      <div class="score-item">
+        <span class="score-label">Draws</span>
+        <span class="score-val" id="score-d">0</span>
+      </div>
+      <div class="score-item">
+        <span class="score-label">Mathias</span>
+        <span class="score-val" id="score-o">0</span>
+      </div>
+    </div>
+
+    <button id="restart">⚓ New Battle</button>
   </div>
 
   <script>
-    const cells = document.querySelectorAll('.cell');
-    const status = document.getElementById('status');
-    const restart = document.getElementById('restart');
+    const cells    = document.querySelectorAll('.cell');
+    const status   = document.getElementById('status');
+    const restart  = document.getElementById('restart');
+    const playerX  = document.getElementById('player-x');
+    const playerO  = document.getElementById('player-o');
+    const scoreX   = document.getElementById('score-x');
+    const scoreO   = document.getElementById('score-o');
+    const scoreD   = document.getElementById('score-d');
 
     const WINS = [
       [0,1,2],[3,4,5],[6,7,8],
@@ -187,17 +447,82 @@
       [0,4,8],[2,4,6]
     ];
 
+    const PIRATE_STATUS = {
+      X: ["Morten rules the seas! ☠️", "Morten plunders the board! 🏴‍☠️", "Victory to Morten! ⚓"],
+      O: ["Mathias takes the treasure! ☠️", "Mathias conquers the seas! 🏴‍☠️", "Mathias wins the battle! ⚓"],
+      draw: ["No quarter given — DRAW! 🌊", "The seas be calm... it's a draw! ⚓", "Dead men tell no tales... DRAW! ☠️"],
+      turnX: ["Morten's move, matey! 🗡️", "Morten plots the course! ⚓", "Morten aims the cannon! 💥"],
+      turnO: ["Mathias walks the plank... er, board! 🏴‍☠️", "Mathias makes a move! ⚓", "Mathias fires back! 💥"],
+    };
+
+    const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+
     let board, current, over;
+    let scores = { X: 0, O: 0, D: 0 };
+
+    // Spawn floating pirate emojis
+    const decos = ['☠️','⚓','🏴‍☠️','⚔️','💀','🪝','🗡️','🌊'];
+    for (let i = 0; i < 10; i++) {
+      const d = document.createElement('div');
+      d.className = 'deco';
+      d.textContent = decos[i % decos.length];
+      d.style.left = Math.random() * 100 + 'vw';
+      d.style.animationDuration = (12 + Math.random() * 18) + 's';
+      d.style.animationDelay = -(Math.random() * 30) + 's';
+      d.style.fontSize = (1.2 + Math.random() * 1.5) + 'rem';
+      document.body.appendChild(d);
+    }
+
+    function setStatus(text) {
+      status.style.animation = 'none';
+      status.offsetHeight; // reflow
+      status.style.animation = 'statusFade 0.3s ease';
+      status.textContent = text;
+    }
+
+    function updatePlayers() {
+      if (current === 'X') {
+        playerX.className = 'player active';
+        playerO.className = 'player inactive';
+      } else {
+        playerX.className = 'player inactive';
+        playerO.className = 'player active';
+      }
+    }
+
+    function bumpScore(el) {
+      el.classList.remove('bump');
+      el.offsetHeight;
+      el.classList.add('bump');
+    }
+
+    function launchConfetti() {
+      const colors = ['#93c5fd','#bae6fd','#e0f2fe','#ffffff','#7dd3fc','#38bdf8'];
+      for (let i = 0; i < 60; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.width = (6 + Math.random() * 8) + 'px';
+        c.style.height = (6 + Math.random() * 8) + 'px';
+        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        c.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        c.style.animationDelay = (Math.random() * 0.8) + 's';
+        document.body.appendChild(c);
+        c.addEventListener('animationend', () => c.remove());
+      }
+    }
 
     function init() {
       board = Array(9).fill('');
       current = 'X';
       over = false;
       cells.forEach(c => {
-        c.textContent = '';
+        c.innerHTML = '';
         c.className = 'cell';
       });
-      status.textContent = "X's turn";
+      setStatus("Morten fires first! ☠️");
+      updatePlayers();
     }
 
     function checkWin() {
@@ -216,19 +541,29 @@
         if (over || board[i]) return;
 
         board[i] = current;
-        cell.textContent = current;
+        const img = document.createElement('img');
+        img.src = current === 'X' ? 'morten.png' : 'mathias.png';
+        img.alt = current === 'X' ? 'Morten' : 'Mathias';
+        cell.appendChild(img);
         cell.classList.add('taken', current.toLowerCase());
 
         const result = checkWin();
         if (result === 'draw') {
-          status.textContent = "It's a draw!";
+          setStatus(rand(PIRATE_STATUS.draw));
+          scores.D++;
+          scoreD.textContent = scores.D;
+          bumpScore(scoreD);
           over = true;
         } else if (result) {
-          status.textContent = `${result} wins!`;
+          setStatus(rand(PIRATE_STATUS[result]));
+          launchConfetti();
+          if (result === 'X') { scores.X++; scoreX.textContent = scores.X; bumpScore(scoreX); }
+          else                 { scores.O++; scoreO.textContent = scores.O; bumpScore(scoreO); }
           over = true;
         } else {
           current = current === 'X' ? 'O' : 'X';
-          status.textContent = `${current}'s turn`;
+          setStatus(rand(PIRATE_STATUS['turn' + current]));
+          updatePlayers();
         }
       });
     });
