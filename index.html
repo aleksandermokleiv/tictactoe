@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 40%, #f64f59 100%);
+      color: #fff;
+      overflow: hidden;
+    }
+
+    /* Soft ambient blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: #a78bfa;
+      top: -100px; left: -100px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: #f472b6;
+      bottom: -80px; right: -80px;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 3rem 2rem;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+
+    h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 0.5rem;
+    }
+
+    #status {
+      font-size: 1.5rem;
+      font-weight: 600;
+      min-height: 2rem;
+      margin-bottom: 1.8rem;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 10px;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.12s, box-shadow 0.2s;
+      user-select: none;
+      letter-spacing: -0.02em;
+    }
+
+    .cell:hover:not(.taken) {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.06);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .cell:active:not(.taken) {
+      transform: scale(0.97);
+    }
+
+    .cell.x {
+      color: #fff;
+      text-shadow: 0 0 20px rgba(255,255,255,0.5);
+    }
+
+    .cell.o {
+      color: rgba(255,255,255,0.85);
+      text-shadow: 0 0 20px rgba(255,255,255,0.4);
+    }
+
+    .cell.win {
+      background: rgba(255, 255, 255, 0.28);
+      border-color: rgba(255,255,255,0.5);
+      box-shadow: 0 0 24px rgba(255,255,255,0.25), inset 0 1px 0 rgba(255,255,255,0.4);
+      transform: scale(1.04);
+    }
+
+    #restart {
+      margin-top: 2rem;
+      padding: 0.65rem 2rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+      font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: rgba(255,255,255,0.18);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 980px;
+      cursor: pointer;
+      letter-spacing: 0.01em;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: background 0.2s, transform 0.12s, box-shadow 0.2s;
+    }
+
+    #restart:hover {
+      background: rgba(255,255,255,0.28);
+      transform: scale(1.04);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    #restart:active {
+      transform: scale(0.97);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Tic Tac Toe</h1>
+    <div id="status">X's turn</div>
+    <div id="board">
+      <div class="cell" data-i="0"></div>
+      <div class="cell" data-i="1"></div>
+      <div class="cell" data-i="2"></div>
+      <div class="cell" data-i="3"></div>
+      <div class="cell" data-i="4"></div>
+      <div class="cell" data-i="5"></div>
+      <div class="cell" data-i="6"></div>
+      <div class="cell" data-i="7"></div>
+      <div class="cell" data-i="8"></div>
+    </div>
+    <button id="restart">New Game</button>
+  </div>
+
+  <script>
+    const cells = document.querySelectorAll('.cell');
+    const status = document.getElementById('status');
+    const restart = document.getElementById('restart');
+
+    const WINS = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    let board, current, over;
+
+    function init() {
+      board = Array(9).fill('');
+      current = 'X';
+      over = false;
+      cells.forEach(c => {
+        c.textContent = '';
+        c.className = 'cell';
+      });
+      status.textContent = "X's turn";
+    }
+
+    function checkWin() {
+      for (const [a, b, c] of WINS) {
+        if (board[a] && board[a] === board[b] && board[b] === board[c]) {
+          [a, b, c].forEach(i => cells[i].classList.add('win'));
+          return board[a];
+        }
+      }
+      return board.every(Boolean) ? 'draw' : null;
+    }
+
+    cells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const i = +cell.dataset.i;
+        if (over || board[i]) return;
+
+        board[i] = current;
+        cell.textContent = current;
+        cell.classList.add('taken', current.toLowerCase());
+
+        const result = checkWin();
+        if (result === 'draw') {
+          status.textContent = "It's a draw!";
+          over = true;
+        } else if (result) {
+          status.textContent = `${result} wins!`;
+          over = true;
+        } else {
+          current = current === 'X' ? 'O' : 'X';
+          status.textContent = `${current}'s turn`;
+        }
+      });
+    });
+
+    restart.addEventListener('click', init);
+    init();
+  </script>
+</body>
+</html>
